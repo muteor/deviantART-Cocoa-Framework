@@ -121,7 +121,7 @@
 }
 
 - (void) oauthClient:(NXOAuth2Client *)aClient didFailToGetAccessTokenWithError:(NSError *)error {
-	NSLog(@"Failed to get access token %d", [error code]);
+	NSLog(@"Failed to get access token %ld", [error code]);
 	[delegate loggedout];
 }
 
@@ -162,7 +162,7 @@
 		}
 		
 		folderid = [[JSON objectForKey: @"folderid"] intValue];
-		[delegate uploadDone: [stashid intValue] folderId: folderid];
+		[delegate uploadDone: [stashid longValue] folderId: folderid];
 	} else {
 		[delegate uploadError: [[JSON objectForKey: @"error_human"] stringValue]];
 	}
