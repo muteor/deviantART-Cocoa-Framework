@@ -38,6 +38,7 @@
 
 - (id) initWithClientID:(NSString *)clientID clientSecret:(NSString *)clientSecret delegate:(NSObject<DAStashUploaderDelegate> *)aDelegate;
 - (void) queueFileName:(NSString *)newFileName;
+- (void) queueFileName:(NSString *)newFileName folder:(NSString *)folder;
 - (void) queueFileName:(NSString *)newFileName title:(NSString *)title comments:(NSString *)comments folder:(NSString *)folder;
 - (void) cancelFileName:(NSString *)existingFileName;
 - (void) logout;

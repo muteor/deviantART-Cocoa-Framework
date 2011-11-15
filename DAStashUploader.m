@@ -311,6 +311,14 @@
 	[self queueFileInfo:someFileInfo];
 }
 
+- (void) queueFileName:(NSString *)newFileName folder:(NSString *)folder {
+    NSMutableDictionary *someFileInfo = [[[NSMutableDictionary alloc] init] autorelease];
+	[someFileInfo setObject:newFileName forKey:@"filename"];
+    [someFileInfo setObject:folder forKey:@"folder"];
+	
+	[self queueFileInfo:someFileInfo];
+}
+
 - (void) queueFileName:(NSString *)newFileName title:(NSString *)title comments:(NSString *)comments folder:(NSString *)folder {
 	NSMutableDictionary *someFileInfo = [[[NSMutableDictionary alloc] init] autorelease];
 	[someFileInfo setObject:newFileName forKey:@"filename"];
