@@ -17,7 +17,7 @@
 		3A5FC35E13588C0F00833F55 /* DA.h in Headers */ = {isa = PBXBuildFile; fileRef = 3A5FC35D13588C0F00833F55 /* DA.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3AA0A27B135F24D200850B37 /* NSString+Base36.h in Headers */ = {isa = PBXBuildFile; fileRef = 3AA0A279135F24D200850B37 /* NSString+Base36.h */; };
 		3AA0A27C135F24D200850B37 /* NSString+Base36.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AA0A27A135F24D200850B37 /* NSString+Base36.m */; };
-		3AC6C03B13786B8C00DCE7FD /* OAuth2Client.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AC6C03A13786B8C00DCE7FD /* OAuth2Client.framework */; };
+		3AB62A7C1481060800C18F68 /* OAuth2Client.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3AB62A7B1481060800C18F68 /* OAuth2Client.framework */; };
 		3AF67CF11355F6CC0013E704 /* NSString+Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 3AF67CEF1355F6CC0013E704 /* NSString+Base64.h */; };
 		3AF67CF21355F6CC0013E704 /* NSString+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AF67CF01355F6CC0013E704 /* NSString+Base64.m */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
@@ -38,7 +38,7 @@
 		3A5FC35D13588C0F00833F55 /* DA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DA.h; sourceTree = "<group>"; };
 		3AA0A279135F24D200850B37 /* NSString+Base36.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Base36.h"; sourceTree = "<group>"; };
 		3AA0A27A135F24D200850B37 /* NSString+Base36.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Base36.m"; sourceTree = "<group>"; };
-		3AC6C03A13786B8C00DCE7FD /* OAuth2Client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OAuth2Client.framework; path = /Users/kouiskas/Documents/deviantArt/applications/OSX/Frameworks/OAuth2Client/build/Release/OAuth2Client.framework; sourceTree = "<absolute>"; };
+		3AB62A7B1481060800C18F68 /* OAuth2Client.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OAuth2Client.framework; path = "../../../../../../Library/Developer/Xcode/DerivedData/OSX-bdfzoenocdaxzwedfivhbhpzlsre/Build/Products/Debug/OAuth2Client.framework"; sourceTree = "<group>"; };
 		3AF67CEF1355F6CC0013E704 /* NSString+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Base64.h"; sourceTree = "<group>"; };
 		3AF67CF01355F6CC0013E704 /* NSString+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Base64.m"; sourceTree = "<group>"; };
 		8DC2EF5A0486A6940098B216 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -52,9 +52,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */,
+				3AB62A7C1481060800C18F68 /* OAuth2Client.framework in Frameworks */,
 				3A430A1513549A14005C4959 /* JSON.framework in Frameworks */,
 				3A52AB3D1355D9CB00750928 /* WebKit.framework in Frameworks */,
-				3AC6C03B13786B8C00DCE7FD /* OAuth2Client.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,10 +101,10 @@
 		1058C7B0FEA5585E11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3AB62A7B1481060800C18F68 /* OAuth2Client.framework */,
 				1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */,
 				3A430A1413549A14005C4959 /* JSON.framework */,
 				3A52AB3C1355D9CB00750928 /* WebKit.framework */,
-				3AC6C03A13786B8C00DCE7FD /* OAuth2Client.framework */,
 			);
 			name = "Linked Frameworks";
 			sourceTree = "<group>";
@@ -253,6 +253,7 @@
 					"\"$(SRCROOT)/../JSON v2.3.1 (Mac)/build/Release\"",
 					"\"$(SRCROOT)/../OAuth2Client/build/Release\"",
 					"\"$(SRCROOT)/../OAuth2Client/build/Debug\"",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/OSX-bdfzoenocdaxzwedfivhbhpzlsre/Build/Products/Debug\"",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -281,6 +282,7 @@
 					"\"$(SRCROOT)/../JSON v2.3.1 (Mac)/build/Release\"",
 					"\"$(SRCROOT)/../OAuth2Client/build/Release\"",
 					"\"$(SRCROOT)/../OAuth2Client/build/Debug\"",
+					"\"$(SRCROOT)/../../../../../../Library/Developer/Xcode/DerivedData/OSX-bdfzoenocdaxzwedfivhbhpzlsre/Build/Products/Debug\"",
 				);
 				FRAMEWORK_VERSION = A;
 				GCC_MODEL_TUNING = G5;

@@ -19,7 +19,4 @@
 - (void) loggedout;
 - (void) loggedin;
 
-- (void) internetOffline;
-- (void) internetOnline;
-
 @end

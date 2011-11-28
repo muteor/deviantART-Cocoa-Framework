@@ -24,10 +24,7 @@
 	NSMutableDictionary *fileInfo;
 	NSInteger folderid;
 	
-	BOOL tokenResetDuringSession;
 	BOOL submitting;
-	BOOL retry;
-	BOOL voluntaryLogout;
 	unsigned int total;
 	unsigned int currentSize;
 	unsigned int totalSize;
@@ -52,9 +49,9 @@
 - (void) oauthClientNeedsAuthentication:(NXOAuth2Client *)aClient;
 - (void) oauthClientDidGetAccessToken:(NXOAuth2Client *)aClient;
 - (void) oauthClientDidLoseAccessToken:(NXOAuth2Client *)aClient;
+- (void) oauthClientDidRefreshAccessToken:(NXOAuth2Client *)aClient;
 - (void) oauthClient:(NXOAuth2Client *)aClient didFailToGetAccessTokenWithError:(NSError *)error;
 
-- (void) connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
 - (void) connection:(NSURLConnection *)connection didReceiveData:(NSData*)data;
 - (void) connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite;
 

@@ -81,71 +81,54 @@
 	NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
 	[request setURL:authorizationURL];
 	
-	NSLog(@"oauthClientNeedsAuthentication %@", request);
-	
 	[webFrame loadRequest:request];
 	
 	[request release];
 }
 
 - (void) oauthClientDidGetAccessToken:(NXOAuth2Client *)aClient {
-	NSLog(@"(Framework) Logged In");
 	[delegate loggedin];
 	
-	if (!submitting && !retry) {
-		[self uploadNextFileName];
-	}
-	
-	if (retry) { // If the token expired, we only realize it AFTER the query, need to retry
-		retry = NO;
-		[self submitToStash];
-	}
+    if (submitting) {
+        if (fileInfo) {
+            [self submitToStash];
+        } else {
+            [self uploadNextFileName];
+        }
+    }
 }
 
 - (void) oauthClientDidLoseAccessToken:(NXOAuth2Client *)aClient {
-	NSLog(@"(Framework) Logged Out");
-	[delegate loggedout];
-	
-	if (voluntaryLogout) {
-		voluntaryLogout = NO;
-		return;
-	}
-	
-	[aClient setAccessToken:NO];
-	[aClient requestAccess];
-	
-	if (totalProgress > 0) {
-		totalProgress -= currentSize;
-	}
-	retry = YES;
+    [delegate loggedout];
+}
+
+- (void) oauthClientDidRefreshAccessToken:(NXOAuth2Client *)aClient {
+    [delegate loggedin];
+    
+    if (fileInfo) {
+        [self submitToStash];
+    }
 }
 
 - (void) oauthClient:(NXOAuth2Client *)aClient didFailToGetAccessTokenWithError:(NSError *)error {
-	NSLog(@"Failed to get access token %ld", [error code]);
+	NSLog(@"(Framework) Failed to get access token %ld", [error code]);
 	[delegate loggedout];
-}
-
-- (void) connection:(NSURLConnection *) connection didReceiveResponse:(NSURLResponse *) response {
-	[delegate internetOnline];
-	NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-	
-	NSLog(@"didReceiveResponse");
-	
-	if ([httpResponse statusCode] == 401) {
-		// This means we lost access, let's delete the stored access token
-		[client setAccessToken:nil];
-	}
+    
+    if (submitting) {
+        [aClient setAccessToken:NO];
+        [aClient requestAccess];
+        
+        if (totalProgress > 0) {
+            totalProgress -= currentSize;
+        }
+    }
 }
 
 - (void) connection:(NSURLConnection *) connection didReceiveData:(NSData*) data {
-	[delegate internetOnline];
 	NSMutableData *receivedData = [[NSMutableData alloc] init];
 	[receivedData appendData:data];
 	
 	NSString *JSONString = [[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding];
-	
-	// What the API call returned, JSON
-	NSLog(@"JSON: %@", JSONString);
 	
 	SBJsonParser *parser = [[SBJsonParser alloc] init];
 	NSDictionary *JSON = [parser objectWithString:JSONString error:nil];
@@ -159,12 +142,32 @@
 			NSLog(@"Successful placebo call, send the file now");
 			[self submitToStash];
 			return;
-		}
-		
+		} else {
+            // Upload was successful, clear the "current file to upload"
+            if (fileInfo) {
+                [fileInfo release];
+                fileInfo = nil;
+            }
+        }
+        
 		folderid = [[JSON objectForKey: @"folderid"] intValue];
 		[delegate uploadDone: [stashid longValue] folderId: folderid];
 	} else {
-		[delegate uploadError: [[JSON objectForKey: @"error_human"] stringValue]];
+        NSString *error = [JSON objectForKey: @"error"];
+        if ([error isEqualToString:@"expired_token"]) {
+            [client refreshAccessToken];
+            return;
+        } else if ([error isEqualToString:@"invalid_token"]) {
+            [client setAccessToken:NO];
+            [client requestAccess];
+            
+            if (totalProgress > 0) {
+                totalProgress -= currentSize;
+            }
+            return;
+        } else {
+            [delegate uploadError: [[JSON objectForKey: @"error_human"] stringValue]];
+        }
 	}
 	
 	[receivedData release];
@@ -177,13 +180,10 @@
 }
 
 - (void) connection:(NSURLConnection *) connection didSendBodyData:(NSInteger) bytesWritten totalBytesWritten:(NSInteger) totalBytesWritten totalBytesExpectedToWrite:(NSInteger) totalBytesExpectedToWrite {
-	[delegate internetOnline];
 	[delegate uploadProgress:(totalProgress + [[NSNumber numberWithInteger:totalBytesWritten] floatValue]) / totalSize];
 }
 
 - (void) connection:(NSURLConnection *) connection didFailWithError:(NSError *)error {
-	[delegate internetOffline];
-	
 	// Connection error, probably the user's internet connection failing, let's schedule a retry
 	NSLog(@"Internet connection failed, scheduling retry: %@", [error localizedDescription]);
 	
@@ -200,17 +200,11 @@
 }
 
 - (void) webView:(WebView *) sender didReceiveServerRedirectForProvisionalLoadForFrame:(WebFrame *) frame {
-	NSLog(@"didReceiveServerRedirectForProvisionalLoadForFrame");
-	
 	WebDataSource *ds = [frame provisionalDataSource];
 	NSMutableURLRequest *ur = [ds request];
 	
-	NSLog(@"didReceiveServerRedirectForProvisionalLoadForFrame request: %@", ur);
-	
 	NSURL *url = [ur mainDocumentURL];
 	NSString *urls = [url absoluteString];
-	
-	NSLog(@"didReceiveServerRedirectForProvisionalLoadForFrame url 2: %@", urls);
 	
 	if ([urls rangeOfString:@"dAStashUploader://" options:NSCaseInsensitiveSearch].location != NSNotFound) {
         if ([urls rangeOfString:@"error=" options:NSCaseInsensitiveSearch].location != NSNotFound) {
@@ -220,12 +214,9 @@
         }
         [webWindow close];
 	} else {
-		NSLog(@"Open the web window!");
 		[webWindow makeKeyAndOrderFront:self];
 		[webWindow center];
 	}
-	
-	submitting = NO;
 }
 
 - (void) webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame {
@@ -234,9 +225,8 @@
 }
 
 - (void) webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame {
-	NSLog(@"didFinishLoadForFrame: %@", [[frame dataSource] data]);
-	/*[webWindow makeKeyAndOrderFront:self];
-	[webWindow center];*/
+	[webWindow makeKeyAndOrderFront:self];
+	[webWindow center];
 }
 
 - (void)webView:(WebView *)sender willPerformClientRedirectToURL:(NSURL *)URL delay:(NSTimeInterval)seconds fireDate:(NSDate *)date forFrame:(WebFrame *)frame {
@@ -262,7 +252,6 @@
 	}
 	
 	if ([token length] == 0) {
-		NSLog(@"The token is missing to begin with");
 		[self logout];
 		[client requestAccess];
 		return;
@@ -283,8 +272,6 @@
 	NSDictionary *attributes = [fileManager attributesOfItemAtPath:[fileInfo objectForKey:@"filename"] error:nil];
 	currentSize = [[attributes valueForKey:NSFileSize] intValue];
 	
-	NSLog(@"Placebo call before we use the token");
-	
 	if (lastRequest) {
 		[lastRequest release];
 	}
@@ -299,7 +286,6 @@
 	
 	connection = [[NSURLConnection alloc] initWithRequest:lastRequest delegate:self];
 	if (!connection) {
-		[delegate internetOffline];
 		NSLog(@"Connection failed");
 	}
 }
@@ -325,8 +311,6 @@
 	[someFileInfo setObject:title forKey:@"title"];
 	[someFileInfo setObject:comments forKey:@"artist_comments"];
 	[someFileInfo setObject:folder forKey:@"folder"];
-	
-	NSLog(@"Folder name queued: %@", folder);
 	
 	[self queueFileInfo:someFileInfo];
 }
@@ -404,7 +388,6 @@
 }
 
 - (void) logout {
-	voluntaryLogout = YES;
 	[client setAccessToken:NO];
 	
 	NSMutableURLRequest *logoutRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://www.deviantart.com/users/logout-from-useragent"]];
@@ -432,7 +415,6 @@
 	
 	if ([fileInfo objectForKey:@"folder"]) {
 		NSString *cleanFolder = [[[fileInfo objectForKey:@"folder"] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-		NSLog(@"Clean folder name: %@", cleanFolder);
 		path = [NSString stringWithFormat:@"%@folder=%@&", path, cleanFolder];
 	}
 	
@@ -490,7 +472,6 @@
 	
 	connection = [[NSURLConnection alloc] initWithRequest:lastRequest delegate:self];
 	if (!connection) {
-		[delegate internetOffline];
 		NSLog(@"Connection failed");
 	}
 	
