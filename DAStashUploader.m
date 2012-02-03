@@ -13,7 +13,7 @@
 		sizeList = [[NSMutableDictionary alloc] init];
 		
 		dASecureURL = [[NSString alloc ]initWithString:@"https://www.deviantart.com"];
-		dAStashAPIURL = [[NSString alloc] initWithString:@"https://www.deviantart.com/api/draft10/submit"];
+		dAStashAPIURL = [[NSString alloc] initWithString:@"https://www.deviantart.com/api/draft10/stash/submit"];
 		dAStashAPIPlaceboURL = [[NSString alloc] initWithString:@"https://www.deviantart.com/api/draft10/placebo"];
 		
 		client = [[NXOAuth2Client alloc] initWithClientID:clientID
